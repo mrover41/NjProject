@@ -28,19 +28,23 @@ public class PlayerToPlaneGravity : MonoBehaviour {
         if (targetTransform == null) yield break;
 
         Vector3 targetUp = targetRotation * Vector3.up;
-        Quaternion targetRotationOffset = Quaternion.FromToRotation(targetTransform.up, targetUp);
-        Quaternion finalRotation = targetRotationOffset * targetTransform.rotation;
 
-        while (Quaternion.Angle(targetTransform.rotation, finalRotation) > 0.01f) {
-            targetTransform.rotation = Quaternion.RotateTowards(
-                targetTransform.rotation,
-                finalRotation,
-                speed * Time.deltaTime
+        while (Vector3.Angle(targetTransform.up, targetUp) > 0.1f) {
+            if (targetTransform == null) yield break;
+
+            Vector3 currentUp = Vector3.RotateTowards(
+                targetTransform.up, 
+                targetUp, 
+                speed * Mathf.Deg2Rad * Time.deltaTime, 
+                0f
             );
+
+            Quaternion alignRotation = Quaternion.FromToRotation(targetTransform.up, currentUp);
+            targetTransform.rotation = alignRotation * targetTransform.rotation;
 
             yield return null;
         }
 
-        targetTransform.rotation = finalRotation;
-    }   
+        targetTransform.rotation = Quaternion.FromToRotation(targetTransform.up, targetUp) * targetTransform.rotation;
+    }
 }
