@@ -4,9 +4,11 @@ using UnityEngine;
 public class PlayerToPNormalGravity : MonoBehaviour {
     [SerializeField] private float _garavityScale = 9.8f;
     [SerializeField] private float _rspeed = 90f;
+    [SerializeField] private float _rspeedMlpiplayer = 5f;
     [SerializeField] private bool _update = false;
+    [SerializeField] private bool _smoothUpdate = false;
 
-    private Collision _playerCollider = null;
+    //private Collision _playerCollider = null;
     private Transform _playerTransform = null;
     private bool _doneToUpdateRotation = false;
 
@@ -17,11 +19,12 @@ public class PlayerToPNormalGravity : MonoBehaviour {
         _playerMov = ScheneManager.Instance.PlayerInstance.GetModule<PlayerMovment>();
     }
 
-    void Update() {
+    private void OnCollisionStay(Collision other) {
         if (!_update) return;
-        if (_playerCollider == null || _playerTransform == null) return;
+        if (!other.gameObject.CompareTag("Player")) return;
+        if (_playerTransform == null) return;
 
-        Vector3 surfaceNormal = ClalulateSurfaceNormal(_playerCollider);
+        Vector3 surfaceNormal = ClalulateSurfaceNormal(other);
         Quaternion surfaceRotation = ClalulateTargetRotation(surfaceNormal);
 
         Vector3 targetUp = surfaceRotation * Vector3.up;
@@ -30,17 +33,13 @@ public class PlayerToPNormalGravity : MonoBehaviour {
         _playerMov.Gravity = surfaceNormal * _garavityScale;
 
         if (!_doneToUpdateRotation) RotateUpdate(_playerTransform, surfaceRotation, _rspeed);
-        else RotateUpdate(_playerTransform, surfaceRotation, 0, true);
-    }
-
-    private void OnCollisionStay(Collision other) {
-        if (!_update) return;
-        if (other.gameObject.CompareTag("Player")) _playerCollider = other;
+        else if (!_smoothUpdate) RotateUpdate(_playerTransform, surfaceRotation, 0, true);
+        else RotateUpdate(_playerTransform, surfaceRotation, _rspeed * _rspeedMlpiplayer);
     }
 
     private void OnCollisionEnter(Collision other) {
         if (other.gameObject.CompareTag("Player")) {
-            _playerCollider = other;
+            //_playerCollider = other;
             _playerTransform = other.gameObject.GetComponent<Collider>().gameObject.transform;
             if (_update) return;
             
@@ -56,7 +55,6 @@ public class PlayerToPNormalGravity : MonoBehaviour {
     private void OnCollisionExit(Collision other) {
         if (other.gameObject.CompareTag("Player")) {
             _doneToUpdateRotation = false;
-            _playerCollider = null;
         } 
     }
 
@@ -68,30 +66,6 @@ public class PlayerToPNormalGravity : MonoBehaviour {
     private Quaternion ClalulateTargetRotation(Vector3 normal) {
         return Quaternion.FromToRotation(Vector3.up, -normal);
     }
-
-    /*private IEnumerator RotateObjectToTarget(Transform targetTransform, Quaternion targetRotation, float speed) {
-        if (targetTransform == null) yield break;
-
-        Vector3 targetUp = targetRotation * Vector3.up;
-
-        while (Vector3.Angle(targetTransform.up, targetUp) > 0.1f) {
-            if (targetTransform == null) yield break;
-
-            Vector3 currentUp = Vector3.RotateTowards(
-                targetTransform.up, 
-                targetUp, 
-                speed * Mathf.Deg2Rad * Time.deltaTime, 
-                0f
-            );
-
-            Quaternion alignRotation = Quaternion.FromToRotation(targetTransform.up, currentUp);
-            targetTransform.rotation = alignRotation * targetTransform.rotation;
-
-            yield return null;
-        }
-
-        targetTransform.rotation = Quaternion.FromToRotation(targetTransform.up, targetUp) * targetTransform.rotation;
-    }*/
 
     private IEnumerator RotateObjectToTarget(Transform targetTransform, Quaternion targetRotation, float speed) {
         if (targetTransform == null) yield break;
@@ -112,23 +86,18 @@ public class PlayerToPNormalGravity : MonoBehaviour {
     private void RotateUpdate(Transform targetTransform, Quaternion targetRotation, float speed, bool ignoreSpeed = false) {
         Vector3 targetUp = targetRotation * Vector3.up;
 
+        Quaternion tiltRotation = Quaternion.FromToRotation(targetTransform.up, targetUp);
+        Quaternion targetFullRotation = tiltRotation * targetTransform.rotation;
+
         if (ignoreSpeed) {
-            Vector3 projectedForward = Vector3.ProjectOnPlane(targetTransform.forward, targetUp).normalized;
-            if (projectedForward.sqrMagnitude < 0.001f) projectedForward = Vector3.ProjectOnPlane(targetTransform.right, targetUp).normalized;
-            targetTransform.rotation = Quaternion.LookRotation(projectedForward, targetUp);
+            targetTransform.rotation = targetFullRotation;
             return;
         }
 
-        Vector3 currentUp = Vector3.RotateTowards(
-            targetTransform.up, 
-            targetUp, 
-            speed * Mathf.Deg2Rad * Time.deltaTime, 
-            0f
+        targetTransform.rotation = Quaternion.RotateTowards(
+            targetTransform.rotation, 
+            targetFullRotation, 
+            speed * Time.deltaTime
         );
-
-        Quaternion alignRotation = Quaternion.FromToRotation(targetTransform.up, currentUp);
-        targetTransform.rotation = alignRotation * targetTransform.rotation;
-
-        //targetTransform.rotation = Quaternion.FromToRotation(targetTransform.up, targetUp) * targetTransform.rotation;
     }
 }
