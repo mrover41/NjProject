@@ -2,8 +2,6 @@ using UnityEngine;
 
 [System.Serializable]
 public class PlayerMovment : ModuleBase {
-    private Rigidbody _rb;
-
     private float slashT = 0;
     private Vector3 slashDirection;
     private int groundCounter = 0;
@@ -23,10 +21,12 @@ public class PlayerMovment : ModuleBase {
 
     [SerializeField] public Vector3 Gravity = new Vector3(0, -9.81f, 0);
 
+    public Rigidbody rb;
     public Vector3 direction {get; private set;}
     public Vector3 input {get; private set;}
     public bool Grounded => groundCounter > 0;
     public bool isEnabled = true;
+    public bool isDashEnabled = true;
     public bool isWalking {get; private set;} = false;
     public bool isDashing {get; private set;} = false;
 
@@ -36,8 +36,8 @@ public class PlayerMovment : ModuleBase {
     }
 
     public override void OnEnable(Player pl) {
-        _rb = pl.gameObject.GetComponent<Rigidbody>();
-        _rb.useGravity = false;
+        rb = pl.gameObject.GetComponent<Rigidbody>();
+        rb.useGravity = false;
     }
 
     public override void OnUpdate() {
@@ -53,9 +53,9 @@ public class PlayerMovment : ModuleBase {
 
     private void UpdateInput() {
         if (Input.GetKeyDown(KeyCode.Space) && Grounded) { 
-            //_rb.linearVelocity += new Vector3(0, jumpSpeed, 0) + direction.normalized * jumpForce;
-            _rb.linearVelocity += player.gameObject.transform.up * jumpSpeed + direction.normalized * jumpForce;
-        } if (Input.GetKeyDown(KeyCode.LeftShift) && slashT + slashTime <= Time.time) {
+            //rb.linearVelocity += new Vector3(0, jumpSpeed, 0) + direction.normalized * jumpForce;
+            rb.linearVelocity += player.gameObject.transform.up * jumpSpeed + direction.normalized * jumpForce;
+        } if (Input.GetKeyDown(KeyCode.LeftShift) && slashT + slashTime <= Time.time && isDashEnabled) {
             slashT = Time.time;
             slashDirection = direction.normalized;
             if (slashDirection.magnitude == 0) slashDirection = player.gameObject.transform.forward;
@@ -70,29 +70,29 @@ public class PlayerMovment : ModuleBase {
 
         if (slashT + slashTime >= Time.time) {
             isDashing = true;
-            _rb.linearVelocity = slashDirection * slashSpeed;
+            rb.linearVelocity = slashDirection * slashSpeed;
             return;
         } else if (isDashing) {
-            _rb.linearVelocity = Vector3.zero;
+            rb.linearVelocity = Vector3.zero;
             isDashing = false;
         }
 
         if (input.magnitude > deadZone && Grounded) {
-            _rb.linearDamping = damping;
-            Vector3 localVel = player.gameObject.transform.InverseTransformDirection(_rb.linearVelocity);
+            rb.linearDamping = damping;
+            Vector3 localVel = player.gameObject.transform.InverseTransformDirection(rb.linearVelocity);
             Vector3 newLocalXZ = Vector3.ClampMagnitude(new Vector3(localVel.x + localDir.x, 0, localVel.z + localDir.z), maxSpeed);
-            _rb.linearVelocity = player.gameObject.transform.TransformDirection(new Vector3(newLocalXZ.x, localVel.y, newLocalXZ.z));
+            rb.linearVelocity = player.gameObject.transform.TransformDirection(new Vector3(newLocalXZ.x, localVel.y, newLocalXZ.z));
             isWalking = true;
         } else if (Grounded) {
-            _rb.linearDamping = defaultDamping;
+            rb.linearDamping = defaultDamping;
             isWalking = false;
         } else {
-            _rb.linearDamping = 0;
-            _rb.linearVelocity += player.gameObject.transform.TransformDirection(new Vector3(localDir.x * airMult, 0, localDir.z * airMult));
+            rb.linearDamping = 0;
+            rb.linearVelocity += player.gameObject.transform.TransformDirection(new Vector3(localDir.x * airMult, 0, localDir.z * airMult));
             isWalking = false;
         }
 
-        _rb.AddForce(Gravity, ForceMode.Acceleration);
+        rb.AddForce(Gravity, ForceMode.Acceleration);
     }
 
     public override void OnCollisionEnter(Collision collision) {
