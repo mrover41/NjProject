@@ -19,7 +19,7 @@ public class PlayerMovment : ModuleBase {
     [SerializeField] private float slashCooldown = 5;
     [SerializeField] private string groundTag = "Ground";
 
-    [SerializeField] public Vector3 Gravity = new Vector3(0, -9.81f, 0);
+    [SerializeField] public Vector3 Gravity = new Vector3(0, -9.8f, 0);
 
     public Rigidbody rb;
     public Vector3 direction {get; private set;}

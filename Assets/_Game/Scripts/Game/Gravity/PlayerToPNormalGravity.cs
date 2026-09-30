@@ -60,6 +60,7 @@ public class PlayerToPNormalGravity : MonoBehaviour {
 
     private Vector3 ClalulateSurfaceNormal(Collision other) {
         if (other.contactCount < 0) return Vector3.zero;
+        Debug.Log(other.contacts[0].normal);
         return other.contacts[0].normal;
     }
 
