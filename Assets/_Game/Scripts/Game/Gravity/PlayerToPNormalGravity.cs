@@ -46,7 +46,14 @@ public class PlayerToPNormalGravity : MonoBehaviour {
             Vector3 surfaceNormal = ClalulateSurfaceNormal(other);
             Quaternion surfaceRotation = ClalulateTargetRotation(surfaceNormal);
 
-            _playerMov.Gravity = surfaceNormal * _garavityScale;
+            Vector3 gravity = surfaceNormal * _garavityScale;
+            _playerMov.Gravity = new Vector3(
+                Mathf.Round(gravity.x * 100f) / 100f,
+                Mathf.Round(gravity.y * 100f) / 100f,
+                Mathf.Round(gravity.z * 100f) / 100f
+            );
+
+           // _playerMov.Gravity = surfaceNormal * _garavityScale;
             if (_rotationCoroutine != null) StopCoroutine(_rotationCoroutine);
             _rotationCoroutine = StartCoroutine(RotateObjectToTarget(_playerTransform, surfaceRotation, _rspeed));
         }
@@ -60,7 +67,6 @@ public class PlayerToPNormalGravity : MonoBehaviour {
 
     private Vector3 ClalulateSurfaceNormal(Collision other) {
         if (other.contactCount < 0) return Vector3.zero;
-        Debug.Log(other.contacts[0].normal);
         return other.contacts[0].normal;
     }
 
