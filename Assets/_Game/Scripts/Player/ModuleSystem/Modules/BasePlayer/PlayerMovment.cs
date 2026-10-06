@@ -4,25 +4,27 @@ using UnityEngine;
 public class PlayerMovment : ModuleBase {
     private float slashT = 0;
     private Vector3 slashDirection;
-    private int groundCounter = 0;
 
-    [SerializeField] private float maxSpeed = 10f;
-    [SerializeField] private float force = 15f;
-    [SerializeField] private float airMult = 0.3f;
     [SerializeField] private float deadZone = 0.1f; //only for joysticks
-    [SerializeField] private float defaultDamping = 5;
-    [SerializeField] private float damping = 0.5f;
-    [SerializeField] private float jumpSpeed = 6;
-    [SerializeField] private float jumpForce = 2.5f;
-    [SerializeField] private float slashSpeed = 35;
-    [SerializeField] private float slashTime = 0.2f;
-    [SerializeField] private float slashCooldown = 5;
     [SerializeField] private string groundTag = "Ground";
 
+    [SerializeField] public float force = 15f;
+    [SerializeField] public float airMult = 0.3f;
+    [SerializeField] public float defaultDamping = 5;
+    [SerializeField] public float damping = 0.5f;
+    [SerializeField] public float jumpSpeed = 6;
+    [SerializeField] public float jumpForce = 2.5f;
+    [SerializeField] public float slashSpeed = 35;
+    [SerializeField] public float slashTime = 0.2f;
+    [SerializeField] public float slashCooldown = 5;
+
     [SerializeField] public Vector3 Gravity = new Vector3(0, -9.8f, 0);
+    [SerializeField] public float maxSpeed = 10f;
 
     public Rigidbody rb;
+    public int groundCounter = 0;
     public Vector3 direction {get; private set;}
+    public Vector3 localDirection {get; private set;}
     public Vector3 input {get; private set;}
     public bool Grounded => groundCounter > 0;
     public bool isEnabled = true;
@@ -64,8 +66,8 @@ public class PlayerMovment : ModuleBase {
 
     private void UpdateMoving() {
         input = new Vector3(Input.GetAxis("Horizontal"), 0, Input.GetAxis("Vertical"));
-        direction = (player.gameObject.transform.right * input.x + player.gameObject.transform.forward * input.z).normalized * force * Time.fixedDeltaTime;
         Vector3 localDir = input.normalized * force * Time.fixedDeltaTime;
+        localDirection = localDir;
         direction = player.gameObject.transform.TransformDirection(localDir);
 
         if (slashT + slashTime >= Time.time) {
