@@ -4,18 +4,24 @@ using Ext.Math;
 public class PlaerCamera : ModuleBase {
     [SerializeField] private float sensitivity = 5f;
     [SerializeField] private float maxAngle = 5f;
+    [SerializeField] private float maxFov = 90f;
+    [SerializeField] private float minFov = 85f;
     [SerializeField] private float smooth = 25f;
     
     private float zRotation = 0;
+    private float fov = 0;
+    private float targetFov = 0;
 
     private Transform _cam;
+    private Camera _ccam;
     private Transform _player;
     private PlayerMovment _pMov = null;
 
     private float _xRotation = 0;
 
     public override void OnEnable(Player pl) {
-        _cam = Camera.main.transform;
+        _ccam = Camera.main;
+        _cam = _ccam.transform;
         _player = pl.gameObject.transform;
         _pMov = pl.GetModule<PlayerMovment>();
 
@@ -31,15 +37,15 @@ public class PlaerCamera : ModuleBase {
 
         float targetZ = 0;
         if (_pMov != null) {
-            if (/*_pMov.groundCounter <= 0*/ false) {
-                targetZ = 0;
-            } else {
-                Vector3 localVelocity = player.gameObject.transform.InverseTransformDirection(_pMov.rb.linearVelocity);
-                targetZ = localVelocity.x.Map(-_pMov.maxSpeed, _pMov.maxSpeed, maxAngle, -maxAngle);
-            }
+            Vector3 localVelocity = player.gameObject.transform.InverseTransformDirection(_pMov.rb.linearVelocity);
+            targetZ = localVelocity.x.Map(-_pMov.maxSpeed, _pMov.maxSpeed, maxAngle, -maxAngle);
+
+            if (_pMov.Grounded) targetFov = _pMov.input.z.Map(0, 1, minFov, maxFov);
+            else targetFov = Mathf.Lerp(targetFov, minFov, 15 * Time.deltaTime);
         }
 
         zRotation = Mathf.Lerp(zRotation, targetZ, smooth * Time.deltaTime);
+        _ccam.fieldOfView = targetFov;
 
         _cam.transform.localRotation = Quaternion.Euler(_xRotation, 0f, zRotation);
 
