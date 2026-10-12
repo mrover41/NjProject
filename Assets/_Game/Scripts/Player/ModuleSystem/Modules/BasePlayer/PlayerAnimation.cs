@@ -19,6 +19,8 @@ public class PlayerAnimation : ModuleBase {
     }
 
     public override void OnUpdate() {
+		if (_anim == null || _playerMov == null) return;
+
         if (!_playerMov.Grounded && animStat != AnimationStatus.Fall) {
             _anim.SetTrigger("ToFall");
             animStat = AnimationStatus.Fall;
