@@ -65,7 +65,7 @@ public class PlayerMovment : ModuleBase {
     }
 
     private void UpdateMoving() {
-        input = new Vector3(Input.GetAxis("Horizontal"), 0, Input.GetAxis("Vertical"));
+        input = new Vector3(Input.GetAxisRaw("Horizontal"), 0, Input.GetAxisRaw("Vertical"));
         Vector3 localDir = input.normalized * force * Time.fixedDeltaTime;
         localDirection = localDir;
         direction = player.gameObject.transform.TransformDirection(localDir);
