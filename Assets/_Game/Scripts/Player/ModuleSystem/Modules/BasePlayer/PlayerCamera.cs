@@ -40,13 +40,13 @@ public class PlaerCamera : ModuleBase {
         float targetZ = 0;
         if (_pMov != null) {
 			Vector3 localVelocity;
-			if (_pMov.Grounded || _pMov.isDashing) localVelocity = player.gameObject.transform.InverseTransformDirection(_pMov.rb.linearVelocity);
+			if ((_pMov.Grounded || _pMov.isDashing) && !_pMov.isSlaming) localVelocity = player.gameObject.transform.InverseTransformDirection(_pMov.rb.linearVelocity);
 			else localVelocity = Vector3.zero;
 
 			targetZ = localVelocity.x.Map(-_pMov.maxSpeed, _pMov.maxSpeed, maxAngle, -maxAngle);
 
-			if (_pMov.isDashing) targetFov = _pMov.input.normalized.z.Map(0, 1, minFov, maxDashFov);
-            else if (_pMov.Grounded) targetFov = _pMov.input.normalized.z.Map(0, 1, minFov, maxFov);
+			if (_pMov.isDashing) targetFov = localVelocity.normalized.z.Map(0, 1, minFov, maxDashFov);
+            else if (_pMov.Grounded && !_pMov.isSlaming) targetFov = _pMov.input.normalized.z.Map(0, 1, minFov, maxFov);
             else targetFov = _pMov.rb.linearVelocity.magnitude.Map(0, _pMov.maxSpeed * 5, minFov, maxDashFov);
         }
 

@@ -15,7 +15,7 @@ public class PlayerMovment : ModuleBase {
     [SerializeField] public float jumpSpeed = 6;
     [SerializeField] public float jumpForce = 2.5f;
     [SerializeField] public float slashSpeed = 35;
-    [SerializeField] public float slashTime = 0.2f;
+    [SerializeField] public float slashTime = 0.35f;
     [SerializeField] public float slashCooldown = 5;
 
     [SerializeField] public Vector3 Gravity = new Vector3(0, -9.8f, 0);
@@ -31,6 +31,9 @@ public class PlayerMovment : ModuleBase {
     public bool isDashEnabled = true;
     public bool isWalking {get; private set;} = false;
     public bool isDashing {get; private set;} = false;
+    public bool isSlaming {get; private set;} = false;
+
+	private Vector3 savedLinear = Vector3.zero;
 
     public float DeadZone {
         get => deadZone;
@@ -54,14 +57,37 @@ public class PlayerMovment : ModuleBase {
 
 
     private void UpdateInput() {
-        if (Input.GetKeyDown(KeyCode.Space) && Grounded) { 
-            //rb.linearVelocity += new Vector3(0, jumpSpeed, 0) + direction.normalized * jumpForce;
-            rb.linearVelocity += player.gameObject.transform.up * jumpSpeed + direction.normalized * jumpForce;
-        } if (Input.GetKeyDown(KeyCode.LeftShift) && slashT + slashTime <= Time.time && isDashEnabled) {
+        if (Input.GetKeyDown(KeyCode.Space) && Grounded) rb.linearVelocity += player.gameObject.transform.up * jumpSpeed + direction.normalized * jumpForce;
+
+		if (Input.GetKeyDown(KeyCode.LeftShift) && slashT + slashTime <= Time.time && isDashEnabled) {
             slashT = Time.time;
             slashDirection = direction.normalized;
             if (slashDirection.magnitude == 0) slashDirection = player.gameObject.transform.forward;
-        }
+        } 
+
+		if (Input.GetKeyDown(KeyCode.LeftControl)) {
+			isSlaming = true;
+
+			CapsuleCollider collider = player.gameObject.GetComponent<CapsuleCollider>();
+
+			PhysicsMaterial noFriction = new PhysicsMaterial("ZeroFriction") {
+			    dynamicFriction = 0f,
+			    staticFriction = 0f,
+			    frictionCombine = PhysicsMaterialCombine.Minimum,
+			};
+			collider.sharedMaterial = noFriction;
+			collider.height *= 0.5f;
+
+			savedLinear = rb.linearVelocity;
+		} else if (Input.GetKeyUp(KeyCode.LeftControl)) {
+			isSlaming = false;
+
+			CapsuleCollider collider = player.gameObject.GetComponent<CapsuleCollider>();
+			collider.height *= 2;
+			collider.sharedMaterial = null;
+
+			savedLinear = Vector3.zero;
+		}
     }
 
     private void UpdateMoving() {
@@ -77,7 +103,20 @@ public class PlayerMovment : ModuleBase {
         } else if (isDashing) {
             rb.linearVelocity = Vector3.zero;
             isDashing = false;
-        }
+        } else if (isSlaming) {
+			/*Vector3 local = player.gameObject.transform.InverseTransformDirection(savedLinear);
+			local = new Vector3(local.x, 0, local.z);
+			local = player.gameObject.transform.TransformDirection(local);
+
+			Vector3 localVel = player.gameObject.transform.InverseTransformDirection(rb.linearVelocity);
+			localVel = new Vector3(0, localVel.y, 0);
+			localVel = player.gameObject.transform.TransformDirection(localVel);
+
+			Vector3 newSavedLinear = local += localVel;
+			rb.linearVelocity = newSavedLinear;*/
+			rb.AddForce(Gravity, ForceMode.Acceleration);
+			return;
+		}
 
         if (input.magnitude > deadZone && Grounded) {
             rb.linearDamping = damping;
