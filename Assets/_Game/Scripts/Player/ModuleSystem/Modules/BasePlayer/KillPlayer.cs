@@ -1,14 +1,13 @@
 using UnityEngine;
 using System;
-using System.Linq;
 using UnityEngine.SceneManagement;
 
-public class KillPlayer : ModuleBase {
+public class KillPlayer : MonoBehaviour {
     [SerializeField] private PlayerHealth _phealth;
     [SerializeField] private int scheneIndx = 0;
     
-    public override void OnEnable(Player pl) {
-        _phealth = pl.GetModule<PlayerHealth>();
+    private void Start() {
+        _phealth = GetComponent<PlayerHealth>();
         if (_phealth == null) return;
 
         _phealth.Kill += OnKilling;

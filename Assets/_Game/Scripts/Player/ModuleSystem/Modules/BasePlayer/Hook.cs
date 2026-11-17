@@ -1,8 +1,6 @@
 using UnityEngine;
 
-
-[System.Serializable]
-public class Hook : ModuleBase {
+public class Hook : MonoBehaviour {
     private bool hooking = false;
     private bool isFinded = false;
 
@@ -18,9 +16,9 @@ public class Hook : ModuleBase {
     [SerializeField] private float rqMass = 5;
     [SerializeField] private float otherSpeed = 2500;
 
-    public override void OnEnable(Player pl) {
-        _rb = pl.gameObject.GetComponent<Rigidbody>();
-        lineRenderer = pl.gameObject.AddComponent<LineRenderer>();
+    private void Start() {
+        _rb = GetComponent<Rigidbody>();
+        lineRenderer = gameObject.AddComponent<LineRenderer>();
 
         lineRenderer.startWidth = 0.1f;
         lineRenderer.endWidth = 0.1f;
@@ -32,7 +30,7 @@ public class Hook : ModuleBase {
         lineRenderer.material = lineMaterial;
     }
 
-    public override void OnUpdate() {
+    private void Update() {
         if (Input.GetKeyDown(KeyCode.F)) {
             lineRenderer.enabled = true;
             hooking = true;
@@ -47,7 +45,7 @@ public class Hook : ModuleBase {
         }
     }
 
-    public override void OnFixedUpdate() {
+    private void FixedUpdate() {
         if (hooking) {
             Transform c = Camera.main.gameObject.transform;
             if (!isFinded && Physics.Raycast(c.position, c.forward, out RaycastHit hit, maxLenght) && hit.collider.gameObject.CompareTag("Hook")) {

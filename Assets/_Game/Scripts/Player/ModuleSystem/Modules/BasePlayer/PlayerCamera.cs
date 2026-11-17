@@ -1,7 +1,7 @@
 using UnityEngine;
 using Ext.Math;
 
-public class PlaerCamera : ModuleBase {
+public class PlaerCamera : MonoBehaviour {
     [SerializeField] private float sensitivity = 5f;
     [SerializeField] private float maxAngle = 5f;
     [SerializeField] private float maxFov = 90f;
@@ -9,9 +9,8 @@ public class PlaerCamera : ModuleBase {
     [SerializeField] private float minFov = 85f;
     [SerializeField] private float smooth = 25f;
     [SerializeField] private float fovSmooth = 15f;
-    
+
     private float zRotation = 0;
-    private float fov = 0;
     private float targetFov = 0;
 
     private Transform _cam;
@@ -21,16 +20,16 @@ public class PlaerCamera : ModuleBase {
 
     private float _xRotation = 0;
 
-    public override void OnEnable(Player pl) {
+    private void Start() {
         _ccam = Camera.main;
         _cam = _ccam.transform;
-        _player = pl.gameObject.transform;
-        _pMov = pl.GetModule<PlayerMovment>();
+        _player = transform;
+        _pMov = GetComponent<PlayerMovment>();
 
         Cursor.lockState = CursorLockMode.Locked;
     }
 
-    public override void OnUpdate() {
+    private void Update() {
         float mouseX = Input.GetAxis("Mouse X") * sensitivity;
         float mouseY = Input.GetAxis("Mouse Y") * sensitivity;
 
@@ -40,7 +39,7 @@ public class PlaerCamera : ModuleBase {
         float targetZ = 0;
         if (_pMov != null) {
 			Vector3 localVelocity;
-			if ((_pMov.Grounded || _pMov.isDashing) && !_pMov.isSlaming) localVelocity = player.gameObject.transform.InverseTransformDirection(_pMov.rb.linearVelocity);
+			if ((_pMov.Grounded || _pMov.isDashing) && !_pMov.isSlaming) localVelocity = transform.InverseTransformDirection(_pMov.rb.linearVelocity);
 			else localVelocity = Vector3.zero;
 
 			targetZ = localVelocity.x.Map(-_pMov.maxSpeed, _pMov.maxSpeed, maxAngle, -maxAngle);
@@ -53,8 +52,7 @@ public class PlaerCamera : ModuleBase {
         zRotation = Mathf.Lerp(zRotation, targetZ, smooth * Time.deltaTime);
         _ccam.fieldOfView = Mathf.Lerp(_ccam.fieldOfView, targetFov, fovSmooth * Time.deltaTime);
 
-        _cam.transform.localRotation = Quaternion.Euler(_xRotation, 0f, zRotation);
-
-        _player.Rotate(0f, mouseX, 0f);        
+        _cam.transform.localRotation = Quaternion.Euler(_xRotation, 0, zRotation);
+        _player.Rotate(0f, mouseX, 0f);
     }
 }

@@ -6,7 +6,7 @@ public class ConfigurePlayer : MonoBehaviour {
     private PlayerMovment _plMovment = null;
 
     void Start() {
-        _plMovment = ScheneManager.Instance.PlayerInstance.GetModule<PlayerMovment>();        
+        _plMovment = ScheneManager.Instance.PlayerInstance.GetComponent<PlayerMovment>();        
     }
 
     private void OnTriggerEnter(Collider other) {

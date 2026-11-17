@@ -16,7 +16,7 @@ public class PlayerToPNormalGravity : MonoBehaviour {
     private static Coroutine _rotationCoroutine;
 
     void Start() {
-        _playerMov = ScheneManager.Instance.PlayerInstance.GetModule<PlayerMovment>();
+        _playerMov = ScheneManager.Instance.PlayerInstance.GetComponent<PlayerMovment>();
     }
 
     private void OnCollisionStay(Collision other) {

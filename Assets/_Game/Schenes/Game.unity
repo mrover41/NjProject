@@ -356,6 +356,11 @@ GameObject:
   - component: {fileID: 593018613}
   - component: {fileID: 593018612}
   - component: {fileID: 593018611}
+  - component: {fileID: 1000000001}
+  - component: {fileID: 1000000002}
+  - component: {fileID: 1000000003}
+  - component: {fileID: 1000000004}
+  - component: {fileID: 1000000005}
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
@@ -375,11 +380,108 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 024096507520cef2d8f41ea0b45c9221, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Player
-  _mode: 0
-  modules: []
-  references:
-    version: 2
     RefIds: []
+--- !u!114 &1000000001
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 593018610}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7894c8699be30ca9788604adcc3f4632, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerMovment
+  deadZone: 0.1
+  groundTag: Ground
+  force: 15
+  airMult: 0.3
+  defaultDamping: 5
+  damping: 0.5
+  jumpSpeed: 6
+  jumpForce: 2.5
+  slashSpeed: 35
+  slashTime: 0.35
+  slashCooldown: 5
+  Gravity: {x: 0, y: -9.8, z: 0}
+  maxSpeed: 10
+  rb: {fileID: 593018612}
+  groundCounter: 0
+  isEnabled: 1
+  isDashEnabled: 1
+
+--- !u!114 &1000000002
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 593018610}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cca27abc4adbfb0ba9797a8bb5384628, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlaerCamera
+  _camPos: {fileID: 142916411}
+  sensitivity: 5
+  maxAngle: 5
+  maxFov: 90
+  maxDashFov: 130
+  minFov: 85
+  smooth: 25
+  fovSmooth: 15
+
+--- !u!114 &1000000003
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 593018610}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1b1419d201a30715596480013cb1bb04, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Hook
+  maxLenght: 200
+  speed: 2500
+  hookLayer:
+    serializedVersion: 2
+    m_Bits: 64
+  rqMass: 5
+  otherSpeed: 2500
+
+--- !u!114 &1000000004
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 593018610}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5597e60ac6ab578f4a219778f791f90a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerHealth
+  maxHealth: 100
+  currentHealth: 100
+
+--- !u!114 &1000000005
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 593018610}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6fdca5f2a142f838bbf0ad33e320651b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::KillPlayer
+  _phealth: {fileID: 1000000004}
+  scheneIndx: 0
+
 --- !u!54 &593018612
 Rigidbody:
   m_ObjectHideFlags: 0

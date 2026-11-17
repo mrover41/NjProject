@@ -1,5 +1,5 @@
 using UnityEngine;
 
-public class WaponModule : ModuleBase {
+public class WaponModule : MonoBehaviour {
     
 }

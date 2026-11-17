@@ -1,7 +1,7 @@
 using UnityEngine;
 using System;
 
-public class PlayerHealth : ModuleBase {
+public class PlayerHealth : MonoBehaviour {
     [SerializeField] private float maxHealth = 100;
     [SerializeField] private float currentHealth = 100;
 

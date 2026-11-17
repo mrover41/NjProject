@@ -6,7 +6,7 @@ public class Damage : MonoBehaviour {
     [SerializeField] private float damage = 50;
 
     private void Start() {
-        _phealth = ScheneManager.Instance.PlayerInstance.GetModule<PlayerHealth>();
+        _phealth = ScheneManager.Instance.PlayerInstance.GetComponent<PlayerHealth>();
     }
 
     private void OnTriggerEnter(Collider other) {

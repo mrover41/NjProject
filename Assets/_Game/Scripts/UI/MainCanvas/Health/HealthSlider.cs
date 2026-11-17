@@ -10,7 +10,7 @@ public class HealthSlider : MonoBehaviour {
 
     void Start() {
         _slider = GetComponent<Slider>();
-        _phealth = ScheneManager.Instance.PlayerInstance.GetModule<PlayerHealth>();
+        _phealth = ScheneManager.Instance.PlayerInstance.GetComponent<PlayerHealth>();
         _slider.maxValue = _phealth.MaxHealth;
     }
 

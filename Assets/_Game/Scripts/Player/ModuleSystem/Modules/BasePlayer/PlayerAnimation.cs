@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class PlayerAnimation : ModuleBase {
+public class PlayerAnimation : MonoBehaviour {
     private enum AnimationStatus {
         None,
         Idle,
@@ -13,12 +13,12 @@ public class PlayerAnimation : ModuleBase {
     private Animator _anim = null;
     private PlayerMovment _playerMov = null;
 
-    public override void OnEnable(Player pl) {
-        _anim = pl.GetComponent<Animator>();
-        _playerMov = pl.GetModule<PlayerMovment>();
+    private void Start() {
+        _anim = GetComponent<Animator>();
+        _playerMov = GetComponent<PlayerMovment>();
     }
 
-    public override void OnUpdate() {
+    private void Update() {
 		if (_anim == null || _playerMov == null) return;
 
         if (!_playerMov.Grounded && animStat != AnimationStatus.Fall) {
@@ -38,7 +38,7 @@ public class PlayerAnimation : ModuleBase {
 
     }
 
-    public override void OnDisable() {
+    private void OnDisable() {
         _anim = null;
         _playerMov = null;        
     }

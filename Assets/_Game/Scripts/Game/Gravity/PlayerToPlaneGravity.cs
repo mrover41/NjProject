@@ -9,7 +9,7 @@ public class PlayerToPlaneGravity : MonoBehaviour {
     private Coroutine _rotationCoroutine;
 
     void Start() {
-        _playerMov = ScheneManager.Instance.PlayerInstance.GetModule<PlayerMovment>();
+        _playerMov = ScheneManager.Instance.PlayerInstance.GetComponent<PlayerMovment>();
     }
 
     private void OnTriggerEnter(Collider other) {
